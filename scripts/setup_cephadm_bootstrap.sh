@@ -1,5 +1,5 @@
 #VARS
-cephrel="octopus"
+cephrel="pacific"
 
 echo "##############################################################"
 echo                      "Setting up cephadm"

@@ -9,10 +9,10 @@
 # set VAGRANT_PREFER_SYSTEM_BIN=0
 # https://stackoverflow.com/questions/51437693/permission-denied-with-vagrant
 nodes = [
-  { :hostname => 'osd1',  		:ip => '192.168.2.201', :box => 'centos/stream8', :clone_from => 'template-centos8stream', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' },
-  { :hostname => 'osd2',  		:ip => '192.168.2.202', :box => 'centos/stream8', :clone_from => 'template-centos8stream', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' },
-  { :hostname => 'osd3',  		:ip => '192.168.2.203', :box => 'centos/stream8', :clone_from => 'template-centos8stream', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' },
-  { :hostname => 'bootstrap', 	:ip => '192.168.2.200', :box => 'centos/stream8', :clone_from => 'template-centos8stream', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' }, 																																																													  																																																													  
+  { :hostname => 'osd1',  		:ip => '192.168.2.201', :box => 'rockylinux/8', :clone_from => 'template-rocky8', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' },
+  { :hostname => 'osd2',  		:ip => '192.168.2.202', :box => 'rockylinux/8', :clone_from => 'template-rocky8', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' },
+  { :hostname => 'osd3',  		:ip => '192.168.2.203', :box => 'rockylinux/8', :clone_from => 'template-rocky8', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' },
+  { :hostname => 'bootstrap', 	:ip => '192.168.2.200', :box => 'rockylinux/8', :clone_from => 'template-rocky8', :cpus => 1, :ram => 1024, :osd => 'yes', :osdsize => '20', :esxi => 'yes' }, 																																																													  																																																													  
 ]
 
 varDomain = "fritz.box"
@@ -43,7 +43,8 @@ end
 
 Vagrant.configure("2") do |config|
 	config.vm.synced_folder('.', '/vagrant', type: 'nfs', disabled: true)
-	config.vm.synced_folder('.', '/Vagrantfiles', type: 'rsync', disabled: false)																		  
+	config.vm.synced_folder('.', '/Vagrantfiles', type: 'rsync', disabled: false)
+	config.vm.boot_timeout = 600
 	nodes.each do |node|
 		config.vm.define node[:hostname] do |node_config| 
 			# here we declare variables to use the values defined above in the nodes section, in case no values are defined, we set a default value
@@ -76,7 +77,7 @@ Vagrant.configure("2") do |config|
 					esxi.esxi_password = 'file:'
 					esxi.clone_from_vm = node[:clone_from]
 					esxi.esxi_resource_pool = "/"
-					esxi.esxi_disk_store = 'truenas_nvme_01'
+					esxi.esxi_disk_store = 'truenas_ssd_01'
 					esxi.esxi_virtual_network = ['VM Network','VM Network','VM Network']
 					esxi.guest_memsize = memory.to_s
 					esxi.guest_numvcpus = vcpus.to_s
@@ -84,6 +85,7 @@ Vagrant.configure("2") do |config|
 					esxi.guest_nic_type = 'vmxnet3'
 					#esxi.local_use_ip_cache = 'False'
 					esxi.debug = 'true'
+					esxi.vmkfstools = 'true'
 					if node[:hv] == "yes"
 						esxi.guest_custom_vmx_settings = [['vhv.enable','TRUE']]
 					end #if node[:hv] == "yes"
