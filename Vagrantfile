@@ -85,7 +85,7 @@ Vagrant.configure("2") do |config|
 					esxi.guest_nic_type = 'vmxnet3'
 					#esxi.local_use_ip_cache = 'False'
 					esxi.debug = 'true'
-					esxi.vmkfstools = 'true'
+					esxi.vmkfstools = 'false'
 					if node[:hv] == "yes"
 						esxi.guest_custom_vmx_settings = [['vhv.enable','TRUE']]
 					end #if node[:hv] == "yes"
